@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Drift Suspension now has an angle kit: **60° steering lock** on the car it's fitted to (FH3's stock cars have 30-42°, its drift Horizon Editions 50°). Both the simulation and the normal steering angle are raised; AI cars, loaners and the shop preview follow the part the car is built with.
+- FH6-style drift defaults on the Drift Suspension: camber front -5.0° / rear -1.0°, toe front 0.5° out / rear 0.2° in, caster 7.0°, lowered, softer springs and dampers (front 0.90x/0.85x, rear 0.80x/0.80x).
+- Drift Differential: decel lock lowered to 15 % of the (locked) accel lock, so the car stays loose off the throttle.
+
 ## 1.0.0
 
 First release of **Drift Suspension and Differential for Forza Horizon 3**, on the [FH3 Mod Platform](https://github.com/Levilente/FH3_ModPlatform).
