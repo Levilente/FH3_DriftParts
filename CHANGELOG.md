@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- Faster steering with the Drift Suspension: turning 210, straightening 230 and counter-steering 280 degrees per second (every FH3 car has 105), so the bigger lock is reached and counter-steer kicks in quicker.
+
 ## 1.1.0
 
 - Drift Suspension now has an angle kit: **60° steering lock** on the car it's fitted to (FH3's stock cars have 30-42°, its drift Horizon Editions 50°). Both the simulation and the normal steering angle are raised; AI cars, loaners and the shop preview follow the part the car is built with.

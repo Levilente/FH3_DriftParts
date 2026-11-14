@@ -53,13 +53,20 @@ const unsigned char kDiffNameBytes[] = {0x44, 0x8B, 0x44, 0x9C, 0x70};
 // and dampers (call at 0x19E8023 into 0x19F4B00, which reads the installed part's FrontSpringDamperPhysicsID with the call
 // that returns at 0x19F4BA2). The drift suspension's physics rows are the only ones numbered Ordinal*1000+5, so:
 //   - at 0x19F4BA2 (eax = the front physics id) the mod notes, for this thread, whether the car being built has it;
-//   - at 0x19E8028 (right after the springs are built, r14 = the spec) it raises both steering angles to kDriftLock.
+//   - at 0x19E8028 (right after the springs are built, r14 = the spec) it raises both steering angles to kDriftLock and the
+//     steering speeds (spec+0x64 turning, +0x68 straightening, +0x6C counter-steering, degrees per second).
 // The answer comes from the part the game is building the car with, so the shop preview, AI cars and loaners are all right.
 constexpr uintptr_t kFrontIdAt   = 0x19F4BA2;
 const unsigned char kFrontIdBytes[] = {0x44, 0x8B, 0xC0, 0x48, 0x8D, 0x54, 0x24, 0x58};
 constexpr uintptr_t kAfterSpringsAt = 0x19E8028;
 const unsigned char kAfterSpringsBytes[] = {0x48, 0x8B, 0x9D, 0xC0, 0x07, 0x00, 0x00};
 constexpr float kDriftLock = 60.0f;   // degrees; FH3's stock cars have 30-42, its drift Horizon Editions 50, the largest any car has is 60
+// Steering speed (degrees per second). Every FH3 car has 105 for turning, straightening and counter-steering, which with the
+// 60 degree lock makes full lock take ~0.57 s instead of ~0.40 s: the drift suspension roughly doubles them so the wheels snap
+// into counter-steer faster than on a stock car.
+constexpr float kDriftTurnRate        = 210.0f;   // spec+0x5C+0x08 SteerMaxAngVelTurning
+constexpr float kDriftStraightenRate  = 230.0f;   // +0x0C SteerMaxAngVelStraighten
+constexpr float kDriftCountersteerRate = 280.0f;  // +0x10 SteerAngVelCountersteer
 thread_local bool t_drift_springs = false;
 
 const FH3ModApi* g_api = nullptr;
@@ -162,6 +169,9 @@ void on_springs_built(FH3Context* ctx, void*) {
     float* steer = reinterpret_cast<float*>(ctx->r14 + 0x5C);
     if (steer[0] < kDriftLock) steer[0] = kDriftLock;   // SteerMaxAngle
     if (steer[1] < kDriftLock) steer[1] = kDriftLock;   // SteerMaxAngleFiltered
+    if (steer[2] < kDriftTurnRate) steer[2] = kDriftTurnRate;
+    if (steer[3] < kDriftStraightenRate) steer[3] = kDriftStraightenRate;
+    if (steer[4] < kDriftCountersteerRate) steer[4] = kDriftCountersteerRate;
 }
 
 void hook_at(char* game, uintptr_t rva, const unsigned char* bytes, size_t n, const char* name, FH3InstructionFn fn) {
